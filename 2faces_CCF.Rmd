@@ -1,5 +1,5 @@
 ---
-title: "Two faces of holistic face processing -- results"
+title: "Two faces of holistic face processing -- analyses and results"
 author: "[Haiyang Jin](https://haiyangjin.github.io/)"
 date: "`r format(Sys.time(), '%d-%m-%Y')`"
 output: 
@@ -30,7 +30,7 @@ xaringanExtra::use_clipboard()
 ```
 
 # Preparations
-```{r setup, include=FALSE}
+```{r setup}
 ## load libraries
 library(tidyverse)
 library(readxl)
@@ -39,14 +39,19 @@ library(lmerTest)
 library(optimx)
 library(emmeans)
 library(ggpubr)
+```
 
+```{r}
 folder_lmm <- "lmm_output"
 ylimit_cf_d <- c(-.5, 3.2)
 ylimit_cf_fi_d <- c(-1.1, 1.1)
 ylimit_cf_rt <- c(650, 1150)
 ylimit_cf_fi_rt <- c(-100, 100)
-```
 
+# colors
+con_color <- c("#ffb14e", "#0000ff")
+sig_color <- "red"
+```
 
 ## Load data 
 ```{r read the data file}
@@ -89,7 +94,7 @@ df_tidy <- df_raw %>%
          Alignment = as_factor(Alignment),
          SameDifferent = factor(SameDifferent, levels = c("same", "different")),
          Probability = as_factor(Probability),
-         Resp = if_else(thisResponse == "S", 1, 0),
+         Resp = if_else(thisResponse == "S", 1, 0), # if this response is "same"
          RT = round(reactionTime * 1000+200)) # plus the duration of target faces
 ```
 
@@ -145,11 +150,31 @@ df_lmm <- df_tidy %>%
 ## Steps to obtain the optimal model
 
 1. If the maximal model did not converge, correlations between random effects were removed, making the zero-correlation-parameter (ZCP) model. 
-2. Principal component analysis implemented with “rePCA()” function was then used to identify random effects that explained less than 0.1% of the total variances; they were removed from the ZCP model to make the reduced model. 
+2. Principal component analysis implemented with `rePCA()` function was then used to identify random effects that explained less than 0.1% of the total variances; they were removed from the ZCP model to make the reduced model. 
 3. The extended model was built by adding back the correlations between random effects in the reduced model. 
-4. If the extended model did not converge, the random effects that explained less than 1% of total variances were identified by “rePCA()” and removed to make the updated extended model; this step was iterated until an extended model converged. 
-5. The converged extended model was then compared to the reduced model via “anova()” function and the model that explained the data better (with smaller Bayesian Information Criterion) was used as the optimal model. 
+4. If the extended model did not converge, the random effects that explained less than 1% of total variances were identified by `rePCA()` and removed to make the updated extended model; this step was iterated until an extended model converged. 
+5. The converged extended model was then compared to the reduced model via `anova()` function and the model that explained the data better (with smaller Bayesian Information Criterion) was used as the optimal model. 
 6. All follow-up analyses were performed on the optimal model. 
+
+## Effects of interest
+
+Two sets of analyses were conducted to examine (1) the composite effect and (2) facilitation and interference for each dependent variable.
+
+### Behavioral choices
+For behavioral choices, signal detection models were implemented by GLMM with binomial error distribution and `probit` link, in which sensitivity d’ was defined as z(hits) – z(false alarms) and `same` in `SameDifferent` was treated as “signal”. 
+
+a. The composite effect was tested by:
+    1. The Congruency effect for aligned faces in sensitivity d’, i.e., the interaction between Congruency and Correct Response in the aligned condition 
+    2. The differences of the Congruency effects (congruent – incongruent) between the aligned and misaligned conditions in sensitivity d’ (this effect was denoted as the interaction between Congruency and Alignment of d’ in the results), i.e., the interaction between Congruency, Alignment and Correct Response. 
+b. Facilitation and interference effects were examined by pairwise comparisons between aligned and misaligned composites in sensitivity d’, i.e., interaction between Alignment and Correct Response for congruent and incongruent trials separately. 
+
+### Response times
+For (correct) response times, GLMM with `lognormal` transformation was applied. 
+
+a. The composite effect was tested by:
+    1. The Congruency effect for aligned composites;
+    2. The interaction between Congruency and Alignment.
+b. Facilitation and interference effects were tested by pairwise comparisons between aligned and misaligned composites in congruent and incongruent conditions separately
 
 # Experiment 1
 ```{r only keep E1}
@@ -161,7 +186,7 @@ df_lmm_E1 <- df_lmm %>%
 ```
 There were `r nlevels(df_lmm_E1$Participant)` participants in Experiment 1. 
 
-## Response (d')
+## Behavioral choices (d')
 ### Fitting the generalized mixed models
 #### The maximal model
 ```{r resp max d E1}
@@ -457,14 +482,15 @@ plot_E1_cf_d <- summary(emm_E1_d[1:8], infer = c(TRUE, FALSE), adjust = "sidak")
   geom_point(position = position_dodge(width = 0.1), size = 2) +
   geom_line(aes(linetype = Congruency), position = position_dodge(width = 0.1),
             size = 0.8) +
-  scale_linetype_manual(values=c("solid", "dashed"))+
+  scale_linetype_manual(values=c("solid", "dashed")) +
+  scale_color_manual(values=con_color) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6, position = position_dodge(width = 0.1),
                 show.legend = F) + 
   facet_grid(. ~Cue, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_d) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = expression("Sensitivity"~italic("d'")), fill = "Congruency") +  # set the names for main, x and y axises
-  geom_text(label = c("***", "", "", "", "*", "", "", ""), color = "red", size = 6, nudge_y = 0.5, nudge_x = 0.5) + # add starts to the significant columns
+  geom_text(label = c("***", "", "", "", "*", "", "", ""), color = sig_color, size = 6, nudge_y = 0.5, nudge_x = 0.5) + # add starts to the significant columns
   theme_bw() +
   theme(
     text = element_text(size = 10),
@@ -530,6 +556,7 @@ plot_E1_cffi_d <- summary(emm_E1_d_fi[1:4], infer=TRUE, adjust = "sidak") %>%
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6) +
   geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_manual(values=con_color) +
   facet_grid(. ~ Congruency, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_fi_d) +  # set the limit for y axis c(0, 1100)
   labs(x = "Congruency", y = expression(italic("d'")~"(aligned-misaligned)")) +  # set the names for main, x and y axises
@@ -758,13 +785,14 @@ plot_E1_cf_rt <- summary(emm_E1_rt, type = "response") %>%
   geom_line(aes(linetype = Congruency), position = position_dodge(width = 0.1),
             size = 0.8) +
   scale_linetype_manual(values=c("solid", "dashed"))+
+  scale_color_manual(values=con_color) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6, position = position_dodge(width = 0.1),
                 show.legend = F) + 
   facet_grid(. ~Cue, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_rt) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = "Correct response times (ms)", fill = "Congruency") +  # set the names for main, x and y axises
-  geom_text(label = c("", "", "++", "+", "", "", "", ""), color = "blue", size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
+  geom_text(label = c("", "", "++", "+", "", "", "", ""), color = sig_color, size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
   theme_bw() +
   theme(
     text = element_text(size = 10),
@@ -820,6 +848,7 @@ plot_E1_cffi_rt <- emm_E1_rt_fi[1:4] %>%
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6) +
   geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_manual(values=con_color) +
   facet_grid(. ~ Congruency, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_fi_rt) +  # set the limit for y axis c(0, 1100)
   labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axises
@@ -905,7 +934,7 @@ df_lmm_E2 <- df_lmm_E2 %>%
 ```
 There were `r nlevels(df_lmm_E2$Participant)` participants in Experiment 2. 
 
-## Response (d')
+## Behavioral choices (d')
 ### Fitting the generalized mixed models
 #### The maximal model
 ```{r E2 resp max d E2}
@@ -1292,6 +1321,7 @@ plot_E2_cf_d <- summary(emm_E2_d[1:16], infer = c(TRUE, FALSE), adjust = "sidak"
   geom_line(aes(linetype = Congruency), position = position_dodge(width = 0.1),
             size = 0.8) +
   scale_linetype_manual(values=c("solid", "dashed"))+
+  scale_color_manual(values=con_color) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6, position = position_dodge(width = 0.1),
                 show.legend = F) + 
@@ -1299,7 +1329,7 @@ plot_E2_cf_d <- summary(emm_E2_d[1:16], infer = c(TRUE, FALSE), adjust = "sidak"
              labeller = labeller(Probability = c(`0.25` = "25% cueing top", `0.75` = "75% cueing top"))) +
   coord_cartesian(ylim = ylimit_cf_d) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = expression("Sensitivity"~italic("d'")), fill = "Congruency") +  # set the names for main, x and y axises
-  geom_text(label = c("***", "", "", "", "*", "", "", "", "***", "", "", "", "", "", "", ""), color = "red", size = 6, nudge_y = 0.4, nudge_x = 0.5) + # add starts to the significant columns
+  geom_text(label = c("***", "", "", "", "*", "", "", "", "***", "", "", "", "", "", "", ""), color = sig_color, size = 6, nudge_y = 0.4, nudge_x = 0.5) + # add starts to the significant columns
   theme_bw() +
   theme(
     text = element_text(size = 10),
@@ -1356,6 +1386,7 @@ plot_E2_cffi_d <- summary(emm_E2_d_fi[1:8], infer=TRUE) %>%
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6) +
   geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_manual(values=con_color) +
   facet_grid(Probability ~ Congruency, switch = "x",
              labeller = labeller(Probability = c(`0.25` = "25% cueing top", `0.75` = "75% cueing top"))) +
   coord_cartesian(ylim = ylimit_cf_fi_d) +  # set the limit for y axis c(0, 1100)
@@ -1632,6 +1663,7 @@ plot_E2_cf_rt <- summary(emm_E2_rt, type = "response") %>%
   geom_line(aes(linetype = Congruency), position = position_dodge(width = 0.1),
             size = 0.8) +
   scale_linetype_manual(values=c("solid", "dashed"))+
+  scale_color_manual(values=con_color) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6, position = position_dodge(width = 0.1),
                 show.legend = F) + 
@@ -1639,7 +1671,7 @@ plot_E2_cf_rt <- summary(emm_E2_rt, type = "response") %>%
              labeller = labeller(Probability = c(`0.25` = "25% cueing top", `0.75` = "75% cueing top"))) +
   coord_cartesian(ylim = ylimit_cf_rt) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = "Correct response times (ms)", fill = "Congruency") +  # set the names for main, x and y axises
-  geom_text(label = c("", "", "**", "***", "", "", "", "", "", "", "*", "*", "", "", "", ""), color = "red", size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
+  geom_text(label = c("", "", "**", "***", "", "", "", "", "", "", "*", "*", "", "", "", ""), color = sig_color, size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
   theme_bw() +
   theme(
     text = element_text(size = 10),
@@ -1697,6 +1729,7 @@ plot_E2_cffi_rt <- emm_E2_rt_fi[1:8] %>%
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6) +
   geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_manual(values=con_color) +
   facet_grid(Probability ~ Congruency, switch = "x",
              labeller = labeller(Probability = c(`0.25` = "25% cueing top", `0.75` = "75% cueing top"))) +
   coord_cartesian(ylim = ylimit_cf_fi_rt) +  # set the limit for y axis c(0, 1100)
@@ -1754,7 +1787,8 @@ contrast(emm_E2_rt_fi, method = list("faci-inte"=c(1, 1)), by = c("Cue", "Probab
 
 
 # Experiment 1 and 2
-## Responses (d')
+Results in this section were not included in the manuscript. The results were similar to E1. 
+## Behavioral choices (d')
 ### Fitting the generalized mixed models
 #### The maximal model
 ```{r resp max d}
@@ -2060,13 +2094,14 @@ plot_E12_cf_d <- summary(emm_d[1:8], infer = c(TRUE, FALSE), adjust = "sidak") %
   geom_line(aes(linetype = Congruency), position = position_dodge(width = 0.1),
             size = 0.8) +
   scale_linetype_manual(values=c("solid", "dashed"))+
+  scale_color_manual(values=con_color) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6, position = position_dodge(width = 0.1),
                 show.legend = F) + 
   facet_grid(. ~Cue, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_d) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = expression("Sensitivity"~italic("d'")), fill = "Congruency") +  # set the names for main, x and y axises
-  geom_text(label = c("***", "", "", "", "**", "", "", ""), color = "red", size = 6, nudge_y = 0.5, nudge_x = 0.5) + # add starts to the significant columns
+  geom_text(label = c("***", "", "", "", "**", "", "", ""), color = sig_color, size = 6, nudge_y = 0.5, nudge_x = 0.5) + # add starts to the significant columns
   theme_bw() +
   theme(
     text = element_text(size = 10),
@@ -2126,6 +2161,7 @@ plot_E12_cffi_d <- summary(emm_d_fi[1:4], infer=TRUE) %>%
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6) +
   geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_manual(values=con_color) +
   facet_grid(. ~ Congruency, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_fi_d) +  # set the limit for y axis c(0, 1100)
   labs(x = "Congruency", y = expression(italic("d'")~"(aligned-misaligned)")) +  # set the names for main, x and y axises
@@ -2376,13 +2412,14 @@ plot_E12_cf_rt <- summary(emm_rt, type = "response") %>%
   geom_line(aes(linetype = Congruency), position = position_dodge(width = 0.1),
             size = 0.8) +
   scale_linetype_manual(values=c("solid", "dashed"))+
+  scale_color_manual(values=con_color) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6, position = position_dodge(width = 0.1),
                 show.legend = F) + 
   facet_grid(. ~Cue, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_rt) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = "Correct response times (ms)", fill = "Congruency") +  # set the names for main, x and y axises
-  geom_text(label = c("", "", "***", "***", "", "", "", ""), color = "red", size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
+  geom_text(label = c("", "", "***", "***", "", "", "", ""), color = sig_color, size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
   theme_bw() +
   theme(
     text = element_text(size = 10),
@@ -2446,6 +2483,7 @@ plot_E12_cffi_rt <- emm_rt_fi[1:4] %>%
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
                 alpha = .6) +
   geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_manual(values=con_color) +
   facet_grid(. ~ Congruency, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_fi_rt) +  # set the limit for y axis c(0, 1100)
   labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axises
@@ -2535,7 +2573,6 @@ plot_E12 <- ggarrange(plot_E12_cf_d_, plot_E12_cffi_d,
 # ggsave(filename = "E12.pdf", plot_E12, width = 10, height = 9)
 plot_E12
 ```
-
 
 # Session information {.unlisted .unnumbered}
 ```{r}
