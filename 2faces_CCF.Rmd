@@ -105,7 +105,7 @@ df_tidy <- df_raw %>%
 + Cue: top vs. bottom
 + Congruency: congruent vs. incongruent
 + Alignment: aligned vs. misaligned
-+ Identity (SameDifferent): same vs. different
++ Correct Response (SameDifferent): same vs. different
 
 Number of trials for each participant:
 ```{r}
@@ -1634,9 +1634,10 @@ contrast(emm_E2_rt_fi, method = list("faci-inte"=c(1, 1)), by = c("Cue", "Probab
 
 # Experiment 1 and 2
 Results in this section were not included in the manuscript. The results were similar to E1. 
-## Behavioral choices (d')
-### Fitting the generalized mixed models
-#### The maximal model
+
+## Behavioral choices (d')  
+### Fitting the generalized mixed models  
+#### The maximal model  
 ```{r resp max d}
 
 # file_resp_max <- file.path(folder_lmm, "Resp_lmm_max.RData")
