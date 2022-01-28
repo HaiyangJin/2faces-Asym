@@ -55,7 +55,6 @@ sig_color <- "red"
 # APA theme for figures
 theme_set(papaja::theme_apa(base_size = 12, base_family = "Helvetica", box = FALSE))
 theme_update(strip.placement = "outside")
-# theme_set(theme_gray(base_size = 20, base_family = 'Helvetica' ))
 ```
 
 ## Load data 
@@ -597,7 +596,7 @@ with log-transformation.
 #     log(RT) ~ Cue * Congruency * Alignment + 
 #       (Cue * Congruency * Alignment | Participant), 
 #     family = lognormal(),
-#     data = df_lmm_rt,
+#     data = df_lmm_E1_rt,
 #     control = glmerControl(optimizer = "optimx", # calc.derivs = FALSE,
 #                            optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
 #   )
@@ -1349,7 +1348,7 @@ with log-transformation.
 #     log(RT) ~ Cue * Congruency * Alignment * Probability + 
 #       (Cue * Congruency * Alignment * Probability | Participant), 
 #     family = lognormal(),
-#     data = df_lmm_rt,
+#     data = df_lmm_E2_rt,
 #     control = glmerControl(optimizer = "optimx", # calc.derivs = FALSE,
 #                            optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
 #   )
