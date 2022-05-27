@@ -51,6 +51,10 @@ ylimit_cf_fi_rt <- c(-100, 100)
 # colors
 con_color <- c("#e28743", "#0000ff")  #ffb14e #e3b342
 sig_color <- "red"
+
+# APA theme for figures
+theme_set(papaja::theme_apa(base_size = 12, base_family = "Helvetica", box = FALSE))
+theme_update(strip.placement = "outside")
 ```
 
 ## Load data 
@@ -101,7 +105,7 @@ df_tidy <- df_raw %>%
 + Cue: top vs. bottom
 + Congruency: congruent vs. incongruent
 + Alignment: aligned vs. misaligned
-+ Identity (SameDifferent): same vs. different
++ Correct Response (SameDifferent): same vs. different
 
 Number of trials for each participant:
 ```{r}
@@ -491,27 +495,7 @@ plot_E1_cf_d <- summary(emm_E1_d[1:8], infer = c(TRUE, FALSE), adjust = "sidak")
   coord_cartesian(ylim = ylimit_cf_d) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = expression("Sensitivity"~italic("d'")), fill = "Congruency") +  # set the names for main, x and y axises
   geom_text(label = c("***", "", "", "", "*", "", "", ""), color = sig_color, size = 6, nudge_y = 0.5, nudge_x = 0.5) + # add starts to the significant columns
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "right",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) 
+  NULL
 
 # ggsave(filename = "E1_cf_d.pdf", plot_E1_cf_d, width = 8, height = 4.8)
 plot_E1_cf_d
@@ -560,27 +544,7 @@ plot_E1_cffi_d <- summary(emm_E1_d_fi[1:4], infer=TRUE, adjust = "sidak") %>%
   facet_grid(. ~ Congruency, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_fi_d) +  # set the limit for y axis c(0, 1100)
   labs(x = "Congruency", y = expression(italic("d'")~"(aligned-misaligned)")) +  # set the names for main, x and y axises
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "none",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) +
+  theme(legend.position = "none") +
   NULL
 
 # ggsave(filename = "E1_fi_d.pdf", plot_E1_cffi_d, width = 7, height = 4.55)
@@ -592,12 +556,13 @@ plot_E1_cffi_d
 plot_E1_cf_d_ <- plot_E1_cf_d +
   guides(color = guide_legend(nrow = 1, title.position = "left"), 
          linetype = guide_legend(nrow = 1, title.position = "left")) +
-  theme(legend.position = c(0.6, 0.075),
-        legend.box = "horizontal") 
+  theme(legend.position = c(0.6, 0.1),
+        legend.box = "horizontal",
+        legend.key.height = unit(0.01, "cm")) 
 
 plot_E1_d <- ggarrange(plot_E1_cf_d_, plot_E1_cffi_d, 
-                       labels = c("A", "B"),
-                       font.label = (list(size = 20)),
+                       labels = c("a", "b"),
+                       font.label = (list(size = 18)),
                        widths = c(1.5, 1),
                        nrow = 1)
 
@@ -631,7 +596,7 @@ with log-transformation.
 #     log(RT) ~ Cue * Congruency * Alignment + 
 #       (Cue * Congruency * Alignment | Participant), 
 #     family = lognormal(),
-#     data = df_lmm_rt,
+#     data = df_lmm_E1_rt,
 #     control = glmerControl(optimizer = "optimx", # calc.derivs = FALSE,
 #                            optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
 #   )
@@ -793,27 +758,7 @@ plot_E1_cf_rt <- summary(emm_E1_rt, type = "response") %>%
   coord_cartesian(ylim = ylimit_cf_rt) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = "Correct response times (ms)", fill = "Congruency") +  # set the names for main, x and y axises
   geom_text(label = c("", "", "++", "+", "", "", "", ""), color = sig_color, size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "right",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) 
+  NULL
 
 # ggsave(filename = "E1_cf_rt.pdf", plot_E1_cf_rt, width = 8, height = 4.8)
 
@@ -851,28 +796,8 @@ plot_E1_cffi_rt <- emm_E1_rt_fi[1:4] %>%
   scale_color_manual(values=con_color) +
   facet_grid(. ~ Congruency, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_fi_rt) +  # set the limit for y axis c(0, 1100)
-  labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axises
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "none",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) +
+  labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axis
+  theme(legend.position = "none") +
   NULL
 
 # ggsave(filename = "E1_fi_rt.pdf", plot_E1_cffi_rt, width = 7, height = 4.55)
@@ -884,12 +809,13 @@ plot_E1_cffi_rt
 plot_E1_cf_rt_ <- plot_E1_cf_rt +
   guides(color = guide_legend(nrow = 1, title.position = "left"), 
          linetype = guide_legend(nrow = 1, title.position = "left")) +
-  theme(legend.position = c(0.55, 0.075),
-        legend.box = "horizontal") 
+  theme(legend.position = c(0.6, 0.1),
+        legend.box = "horizontal",
+        legend.key.height = unit(0.01, "cm")) 
 
 plot_E1_rt <- ggarrange(plot_E1_cf_rt_, plot_E1_cffi_rt, 
-                       labels = c("A", "B"),
-                       font.label = (list(size = 20)),
+                       labels = c("a", "b"),
+                       font.label = (list(size = 18)),
                        widths = c(1.5, 1),
                        nrow = 1)
 
@@ -1330,27 +1256,7 @@ plot_E2_cf_d <- summary(emm_E2_d[1:16], infer = c(TRUE, FALSE), adjust = "sidak"
   coord_cartesian(ylim = ylimit_cf_d) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = expression("Sensitivity"~italic("d'")), fill = "Congruency") +  # set the names for main, x and y axises
   geom_text(label = c("***", "", "", "", "*", "", "", "", "***", "", "", "", "", "", "", ""), color = sig_color, size = 6, nudge_y = 0.4, nudge_x = 0.5) + # add starts to the significant columns
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "right",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) 
+  NULL
 
 # ggsave(filename = "E2_cf_d.pdf", plot_E2_cf_d, width = 8, height = 4.8)
 plot_E2_cf_d
@@ -1390,28 +1296,8 @@ plot_E2_cffi_d <- summary(emm_E2_d_fi[1:8], infer=TRUE) %>%
   facet_grid(Probability ~ Congruency, switch = "x",
              labeller = labeller(Probability = c(`0.25` = "25% cueing top", `0.75` = "75% cueing top"))) +
   coord_cartesian(ylim = ylimit_cf_fi_d) +  # set the limit for y axis c(0, 1100)
-  labs(x = "Congruency", y = expression(italic("d'")~"(aligned-misaligned)")) +  # set the names for main, x and y axises
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "none",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) +
+  labs(x = "Congruency", y = expression(italic("d'")~"(aligned-misaligned)")) +  # set the names for main, x and y axis
+  theme(legend.position = "none") +
   NULL
 
 # ggsave(filename = "E2_fi_d.pdf", plot_E2_cffi_d, width = 7, height = 4.55)
@@ -1427,8 +1313,8 @@ plot_E2_cf_d_ <- plot_E2_cf_d +
         legend.box = "horizontal") 
 
 plot_E2_d <- ggarrange(plot_E2_cf_d_, plot_E2_cffi_d, 
-                       labels = c("A", "B"),
-                       font.label = (list(size = 20)),
+                       labels = c("a", "b"),
+                       font.label = (list(size = 18)),
                        widths = c(1.5, 1),
                        nrow = 1)
 
@@ -1462,7 +1348,7 @@ with log-transformation.
 #     log(RT) ~ Cue * Congruency * Alignment * Probability + 
 #       (Cue * Congruency * Alignment * Probability | Participant), 
 #     family = lognormal(),
-#     data = df_lmm_rt,
+#     data = df_lmm_E2_rt,
 #     control = glmerControl(optimizer = "optimx", # calc.derivs = FALSE,
 #                            optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
 #   )
@@ -1672,27 +1558,7 @@ plot_E2_cf_rt <- summary(emm_E2_rt, type = "response") %>%
   coord_cartesian(ylim = ylimit_cf_rt) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = "Correct response times (ms)", fill = "Congruency") +  # set the names for main, x and y axises
   geom_text(label = c("", "", "**", "***", "", "", "", "", "", "", "*", "*", "", "", "", ""), color = sig_color, size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "right",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) 
+  NULL
 
 # ggsave(filename = "E2_cf_rt.pdf", plot_E2_cf_rt, width = 8, height = 4.8)
 plot_E2_cf_rt
@@ -1733,28 +1599,8 @@ plot_E2_cffi_rt <- emm_E2_rt_fi[1:8] %>%
   facet_grid(Probability ~ Congruency, switch = "x",
              labeller = labeller(Probability = c(`0.25` = "25% cueing top", `0.75` = "75% cueing top"))) +
   coord_cartesian(ylim = ylimit_cf_fi_rt) +  # set the limit for y axis c(0, 1100)
-  labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axises
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "none",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) +
+  labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axis
+  theme(legend.position = "none") +
   NULL
 
 # ggsave(filename = "E2_fi_rt.pdf", plot_E2_cffi_rt, width = 7, height = 4.55)
@@ -1770,8 +1616,8 @@ plot_E2_cf_rt_ <- plot_E2_cf_rt +
         legend.box = "horizontal") 
 
 plot_E2_rt <- ggarrange(plot_E2_cf_rt_, plot_E2_cffi_rt, 
-                       labels = c("A", "B"),
-                       font.label = (list(size = 20)),
+                       labels = c("a", "b"),
+                       font.label = (list(size = 18)),
                        widths = c(1.5, 1),
                        nrow = 1)
 
@@ -1788,9 +1634,10 @@ contrast(emm_E2_rt_fi, method = list("faci-inte"=c(1, 1)), by = c("Cue", "Probab
 
 # Experiment 1 and 2
 Results in this section were not included in the manuscript. The results were similar to E1. 
-## Behavioral choices (d')
-### Fitting the generalized mixed models
-#### The maximal model
+
+## Behavioral choices (d')  
+### Fitting the generalized mixed models  
+#### The maximal model  
 ```{r resp max d}
 
 # file_resp_max <- file.path(folder_lmm, "Resp_lmm_max.RData")
@@ -2102,27 +1949,7 @@ plot_E12_cf_d <- summary(emm_d[1:8], infer = c(TRUE, FALSE), adjust = "sidak") %
   coord_cartesian(ylim = ylimit_cf_d) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = expression("Sensitivity"~italic("d'")), fill = "Congruency") +  # set the names for main, x and y axises
   geom_text(label = c("***", "", "", "", "**", "", "", ""), color = sig_color, size = 6, nudge_y = 0.5, nudge_x = 0.5) + # add starts to the significant columns
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "right",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) 
+  NULL
 
 # ggsave(filename = "E12_cf_d.pdf", plot_E12_cf_d, width = 8, height = 4.8)
 plot_E12_cf_d
@@ -2164,28 +1991,8 @@ plot_E12_cffi_d <- summary(emm_d_fi[1:4], infer=TRUE) %>%
   scale_color_manual(values=con_color) +
   facet_grid(. ~ Congruency, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_fi_d) +  # set the limit for y axis c(0, 1100)
-  labs(x = "Congruency", y = expression(italic("d'")~"(aligned-misaligned)")) +  # set the names for main, x and y axises
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "none",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) +
+  labs(x = "Congruency", y = expression(italic("d'")~"(aligned-misaligned)")) +  # set the names for main, x and y axis
+  theme(legend.position = "none") +
   NULL
 
 # ggsave(filename = "E12_fi_d.pdf", plot_E12_cffi_d, width = 7, height = 4.55)
@@ -2197,12 +2004,13 @@ plot_E12_cffi_d
 plot_E12_cf_d_ <- plot_E12_cf_d +
   guides(color = guide_legend(nrow = 1, title.position = "left"), 
          linetype = guide_legend(nrow = 1, title.position = "left")) +
-  theme(legend.position = c(0.6, 0.075),
-        legend.box = "horizontal") 
+  theme(legend.position = c(0.6, 0.1),
+        legend.box = "horizontal",
+        legend.key.height = unit(0.01, "cm")) 
 
 plot_E12_d <- ggarrange(plot_E12_cf_d_, plot_E12_cffi_d, 
-                       labels = c("A", "B"),
-                       font.label = (list(size = 20)),
+                       labels = c("a", "b"),
+                       font.label = (list(size = 18)),
                        widths = c(1.5, 1),
                        nrow = 1)
 
@@ -2420,27 +2228,7 @@ plot_E12_cf_rt <- summary(emm_rt, type = "response") %>%
   coord_cartesian(ylim = ylimit_cf_rt) +  # set the limit for y axis c(0, 1100)
   labs(x = "Target half", y = "Correct response times (ms)", fill = "Congruency") +  # set the names for main, x and y axises
   geom_text(label = c("", "", "***", "***", "", "", "", ""), color = sig_color, size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "right",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) 
+  NULL
 
 # ggsave(filename = "E12_cf_rt.pdf", plot_E12_cf_rt, width = 8, height = 4.8)
 plot_E12_cf_rt
@@ -2486,28 +2274,8 @@ plot_E12_cffi_rt <- emm_rt_fi[1:4] %>%
   scale_color_manual(values=con_color) +
   facet_grid(. ~ Congruency, switch = "both") +
   coord_cartesian(ylim = ylimit_cf_fi_rt) +  # set the limit for y axis c(0, 1100)
-  labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axises
-  theme_bw() +
-  theme(
-    text = element_text(size = 10),
-    axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14), # the size of the texts in plot
-    # axis.text.x = element_text(angle = 45, vjust = 0.5),
-    legend.title=element_text(size=15),
-    legend.text=element_text(size=14),
-    legend.position = "none",
-    legend.key.width = unit(1.2, "cm"),
-    plot.title = element_text(lineheight=.8, face="bold", size = 17),
-    panel.border = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    axis.line.x = element_line(colour = 'black', size=0.5, linetype='solid'),
-    axis.line.y = element_line(colour = 'black', size=0.5, linetype='solid'),
-    # remove the facet background color
-    strip.text = element_text(face="bold", size=14, lineheight=5.0),
-    strip.background = element_rect(fill="white", colour="white", size=1),
-    strip.placement = "outside"
-  ) +
+  labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axis
+  theme(legend.position = "none") +
   NULL
 
 # ggsave(filename = "E12_fi_rt.pdf", plot_E12_cffi_rt, width = 7, height = 4.55)
@@ -2518,11 +2286,12 @@ plot_E12_cffi_rt
 plot_E12_cf_rt_ <- plot_E12_cf_rt +
   guides(color = guide_legend(nrow = 1, title.position = "left"), 
          linetype = guide_legend(nrow = 1, title.position = "left")) +
-  theme(legend.position = c(0.55, 0.075),
-        legend.box = "horizontal") 
+  theme(legend.position = c(0.6, 0.1),
+        legend.box = "horizontal",
+        legend.key.height = unit(0.01, "cm")) 
 
 plot_E12_rt <- ggarrange(plot_E12_cf_rt_, plot_E12_cffi_rt, 
-                       labels = c("A", "B"),
+                       labels = c("a", "b"),
                        font.label = (list(size = 20)),
                        widths = c(1.5, 1),
                        nrow = 1)
@@ -2542,8 +2311,8 @@ contrast(emm_rt_fi, method = list("faci-inte"=c(1, 1)), by = "Cue")[1:2] %>%
 ```{r fig.asp=1}
 plot_E1 <- ggarrange(plot_E1_cf_d_, plot_E1_cffi_d, 
                      plot_E1_cf_rt_, plot_E1_cffi_rt,
-                     labels = c("A", "B", "C", "D"),
-                     font.label = (list(size = 20)),
+                     labels = c("a", "b", "c", "d"),
+                     font.label = (list(size = 18)),
                      widths = c(1.5, 1),
                      nrow = 2, ncol = 2)
 # ggsave(filename = "E1.pdf", plot_E1, width = 10, height = 9)
@@ -2554,8 +2323,8 @@ plot_E1
 ```{r fig.asp=1}
 plot_E2 <- ggarrange(plot_E2_cf_d_, plot_E2_cffi_d, 
                      plot_E2_cf_rt_, plot_E2_cffi_rt,
-                     labels = c("A", "B", "C", "D"),
-                     font.label = (list(size = 20)),
+                     labels = c("a", "b", "c", "d"),
+                     font.label = (list(size = 18)),
                      widths = c(1.5, 1),
                      nrow = 2, ncol = 2)
 # ggsave(filename = "E2.pdf", plot_E2, width = 10, height = 14)
@@ -2566,8 +2335,8 @@ plot_E2
 ```{r fig.asp=1}
 plot_E12 <- ggarrange(plot_E12_cf_d_, plot_E12_cffi_d, 
                      plot_E12_cf_rt_, plot_E12_cffi_rt,
-                     labels = c("A", "B", "C", "D"),
-                     font.label = (list(size = 20)),
+                     labels = c("a", "b", "c", "d"),
+                     font.label = (list(size = 18)),
                      widths = c(1.5, 1),
                      nrow = 2, ncol = 2)
 # ggsave(filename = "E12.pdf", plot_E12, width = 10, height = 9)

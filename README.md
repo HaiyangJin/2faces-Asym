@@ -1,6 +1,6 @@
 # Two faces of holistic face processing
 
-This repository stores the analysis and other materials for "two faces of holistic face processing" paper. 
+This repository stores the analysis and other materials for "two faces of holistic face processing" article. 
 
 The open materials can be found: https://osf.io/yhm3s/.   
 The preprint is avaiable at: https://psyarxiv.com/qa8ys.
