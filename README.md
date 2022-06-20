@@ -1,11 +1,12 @@
-# Two faces of holistic face processing
+# Facilitation and interference are asymmetric in holistic face processing
 
-This repository stores the analysis and other materials for "two faces of holistic face processing" article. 
+This repository stores the analysis and other materials for "Facilitation and interference are asymmetric in holistic face processing" article. 
 
 The open materials can be found: https://osf.io/yhm3s/.   
 The preprint is avaiable at: https://psyarxiv.com/qa8ys.
 
 ## Abstract
 
-A hallmark of face specificity is holistic processing. It is typically measured by various paradigms such as the part-whole and composite tasks. However, these tasks do not seem to test the same construct, so a comprehensive account of holistic processing remains elusive. Here we investigated the nature of facilitation and interference observed in congruent and incongruent trials in the complete composite face task. These two aspects are asymmetrically influenced by the location and cueing probabilities of the target facial half, demonstrating that there are at least two sources of influence contributing independently to holistic face processing: facilitation and interference. In our view, other tasks, such as the part-whole and standard composite face task, likely reveal facilitation and interference respectively as well. We propose that this perspective provides the opportunity to bring the mixed findings from different paradigms measuring holistic processing into one unified framework.
+A hallmark of face specificity is holistic processing. It is typically measured by paradigms such as the part-whole and composite tasks. However, these tasks show little evidence for common variance, so a comprehensive account of holistic processing remains elusive. One aspect that varies between tasks is whether they measure facilitation or interference from holistic processing. In this study, we examined facilitation and interference in a single paradigm to determine the way in which they manifest during a face perception task. Using congruent and incongruent trials in the complete composite face task, we found that these two aspects are asymmetrically influenced by the location and cueing probabilities of the target facial half, suggesting that they operate somewhat independently. We argue that this perspective has the potential to disentangle mixed findings from different popular paradigms measuring holistic processing in one unified framework.
+
 
