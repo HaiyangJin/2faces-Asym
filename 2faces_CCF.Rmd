@@ -1,5 +1,5 @@
 ---
-title: "Two faces of holistic face processing -- analyses and results"
+title: "Facilitation and interference are asymmetric in holistic face processing -- analyses and results"
 author: "[Haiyang Jin](https://haiyangjin.github.io/)"
 date: "`r format(Sys.time(), '%d-%m-%Y')`"
 output: 
