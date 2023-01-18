@@ -2355,6 +2355,596 @@ plot_E12 <- ggarrange(plot_E12_cf_d_, plot_E12_cffi_d,
 plot_E12
 ```
 
+# LMM on RT (reply)
+## Response times (Experiment 1)
+
+### Fitting the linear mixed models
+without log-transformation.
+#### The maximal model
+```{r E1 rte max lm}
+# file_E1_rte_max <- file.path(folder_lmm, "E1_rte_lmm_max.RData")
+# 
+# # fit the max model
+# if (!file.exists(file_E1_rte_max)) {
+#   lmm_E1_rte_max <- glmer(
+#     log(RT) ~ Cue * Congruency * Alignment +
+#       (Cue * Congruency * Alignment | Participant),
+#     family = lognormal(),
+#     data = df_lmm_E1_rte,
+#     control = glmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+#                            optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+#   )
+# 
+#   save(lmm_E1_rte_max, file = file_E1_rte_max)
+# } else {
+#   load(file_E1_rte_max)
+# }
+# 
+# print(summary(lmm_E1_rte_max), corr = FALSE)
+
+```
+
+#### The zero-correlation-parameter model
+```{r E1 rte zcp}
+file_E1_rte_zcp <- file.path(folder_lmm, "E1_rte_lmm_zcp.RData")
+
+# fit the zcp1 model
+if (!file.exists(file_E1_rte_zcp)) {
+    lmm_E1_rte_zcp <- lmer(
+        RT ~ Cue * Congruency * Alignment +  
+            (Cue_C + Con_C + Ali_C + 
+                 Cue_Con + Cue_Ali + Con_Ali + 
+                 Cue_Con_Ali || Participant),
+        data = df_lmm_E1_rt,
+        control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+                              optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+    )
+    # save(lmm_E1_rte_zcp, file = file_E1_rte_zcp)
+} else {
+    load(file_E1_rte_zcp)
+}
+
+print(summary(lmm_E1_rte_zcp), corr = FALSE)
+```
+
+#### The reduced model
+```{r PCA analysis for rte zcp lmm E1}
+summary(rePCA(lmm_E1_rte_zcp))
+```
+
+`Con_Ali` and `Con_C` were removed from extended model (`lmm_E1_rte_zcp`) due to that the variance it explained was smaller than 0.1%, making `lmm_E1_rte_rdc`.
+
+```{r E1 rte rdc}
+file_E1_rte_rdc <- file.path(folder_lmm, "E1_rte_lmm_rdc.RData")
+
+# fit the rdc1 model
+if (!file.exists(file_E1_rte_rdc)) {
+    lmm_E1_rte_rdc <- lmer(
+        RT ~ Cue * Congruency * Alignment +  
+            (Cue_C + Ali_C + # Con_C + 
+                 Cue_Con + Cue_Ali + # Con_Ali + 
+                 Cue_Con_Ali || Participant),
+        data = df_lmm_E1_rt,
+        control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+                              optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+    )
+    # save(lmm_E1_rte_rdc, file = file_E1_rte_rdc)
+} else {
+    load(file_E1_rte_rdc)
+}
+
+print(summary(lmm_E1_rte_rdc), corr = FALSE)
+```
+
+#### The extended model
+```{r E1 rte etd}
+file_E1_rte_etd <- file.path(folder_lmm, "E1_rte_lmm_etd.RData")
+
+# fit the etd1 model
+if (!file.exists(file_E1_rte_etd)) {
+    lmm_E1_rte_etd <- lmer(
+        RT ~ Cue * Congruency * Alignment +  
+            (Cue_C + Ali_C + # Con_C + 
+                 Cue_Con + Cue_Ali + # Con_Ali + 
+                 Cue_Con_Ali | Participant),
+        data = df_lmm_E1_rt,
+        control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+                              optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+    )
+    # save(lmm_E1_rte_etd, file = file_E1_rte_etd)
+} else {
+    load(file_E1_rte_etd)
+}
+
+print(summary(lmm_E1_rte_etd), corr = FALSE)
+```
+
+```{r PCA analysis for E1 rte etd lmm}
+summary(rePCA(lmm_E1_rte_etd))
+```
+`Ali_C`, and `Cue_Con` were removed from extended model.
+
+```{r E1 rte etd1}
+file_E1_rte_etd1 <- file.path(folder_lmm, "E1_rte_lmm_etd1.RData")
+
+# fit the etd1 model
+if (!file.exists(file_E1_rte_etd1)) {
+    lmm_E1_rte_etd1 <- lmer(
+        RT ~ Cue * Congruency * Alignment +  
+            (Cue_C + # Con_C + Ali_C + 
+                 Cue_Ali + # Con_Ali + Cue_Con + 
+                 Cue_Con_Ali | Participant),
+        data = df_lmm_E1_rt,
+        control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+                              optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+    )
+    # save(lmm_E1_rte_etd1, file = file_E1_rte_etd1)
+} else {
+    load(file_E1_rte_etd1)
+}
+
+print(summary(lmm_E1_rte_etd1), corr = FALSE)
+```
+
+#### The optimal model
+```{r E1 comapre rte etd and rdc}
+# compare the extended and reduced model
+anova(lmm_E1_rte_etd1, lmm_E1_rte_rdc, refit = FALSE)
+```
+
+According to BIC, the reduced model (`lmm_E1_rte_rdc`) explained the data better than the extended model (`lmm_E1_rte_etd1`) and, therefore, the reduced model is used as the optimal model.
+
+```{r E1 the optimal model rte}
+lmm_E1_rte_opt <- lmm_E1_rte_etd1
+
+print(summary(lmm_E1_rte_opt), corr = FALSE)
+```
+
+```{r}
+resi_E1_lmm <- plot(lmm_E1_rte_opt, resid(., scaled=TRUE) ~ fitted(.), abline = 0,
+                    ylim = c(-6, 47),
+                    xlab = "Fitted values (RT)",
+                    ylab = "Scaled residuals",
+                    main= "LMM without log-transformation (Experiment 1)")
+resi_E1_lmm
+```
+
+```{r}
+resi_E1_glmm <- plot(glmm_E1_rt_opt, resid(., scaled=TRUE) ~ fitted(.), abline = 0,
+                     ylim = c(-6, 47),
+                     xlab = "Fitted values (log(RT))",
+                     ylab = "Scaled residuals",
+                     main = "GLMM with log-transformation (Experiment 1)") 
+resi_E1_glmm
+```
+
+### Estimated marginal means
+#### Estimated marginal means for RT
+```{r E1 emm rte}
+file_E1_rte_emm <- file.path(folder_lmm, "E1_rte_emm.RData") 
+if (!file.exists(file_E1_rte_emm)) {
+    emm_E1_rte <- emmeans(lmm_E1_rte_opt, ~ Cue + Congruency + Alignment)
+} else {
+    load(file_E1_rte_emm)
+}
+
+# emmip(regrid(emm_E1_rte), Congruency ~ Alignment | Cue, CIs = TRUE)
+
+summary(emm_E1_rte, type = "response") # equivalent to regrid(emm_rte)
+```
+
+```{r plot for publication E1 rte slides}
+plot_E1_cf_rte <- summary(emm_E1_rte) %>% 
+    as_tibble() %>% 
+    ggplot(aes(y = emmean, x = Alignment, color = Congruency, group = Congruency)) +
+    geom_point(position = position_dodge(width = 0.1), size = 2) +
+    geom_line(aes(linetype = Congruency), position = position_dodge(width = 0.1),
+              size = 0.8) +
+    scale_linetype_manual(values=c("solid", "dashed"))+
+    scale_color_manual(values=con_color) +
+    geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
+                  alpha = .6, position = position_dodge(width = 0.1),
+                  show.legend = F) + 
+    facet_grid(. ~Cue, switch = "both") +
+    coord_cartesian(ylim = ylimit_cf_rt) +  # set the limit for y axis c(0, 1100)
+    labs(x = "Target half", y = "Correct response times (ms)", fill = "Congruency") +  # set the names for main, x and y axises
+    geom_text(label = c("", "", "", "+", "", "", "", ""), color = sig_color, size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
+    NULL
+
+# ggsave(filename = "E1_cf_rte.pdf", plot_E1_cf_rte, width = 8, height = 4.8)
+
+plot_E1_cf_rte
+```
+
+#### Composite effects
+Composite face effects for top and bottom parts:
+```{r}
+emm_E1_rte_cf <- contrast(regrid(emm_E1_rte), interaction = "pairwise", by = "Cue", infer = TRUE)
+emm_E1_rte_cf[1:2]
+```
+
+```{r}
+emm_E1_rte_con <- contrast(regrid(emm_E1_rte), interaction = "pairwise", by = c("Cue", "Alignment"))
+summary(emm_E1_rte_con[c(1,2)], infer = TRUE)
+```
+
+#### Facilitation and interference
+```{r}
+emm_E1_rte_fi <- contrast(regrid(emm_E1_rte), "pairwise", by = c("Cue", "Congruency"), infer=TRUE, adjust = "sidak")
+
+# emmip(emm_E1_rte_fi[1:4], ~ Cue | Congruency, CIs = TRUE, adjust = "sidak")
+emm_E1_rte_fi[1:4]
+```
+
+```{r fi E1 rte, fig.asp=.65}
+plot_E1_cffi_rte <- emm_E1_rte_fi[1:4] %>% 
+    as_tibble() %>% 
+    ggplot(aes(y = estimate, x = Cue, color = Congruency)) +
+    geom_point(size = 2) +
+    geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
+                  alpha = .6) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    scale_color_manual(values=con_color) +
+    facet_grid(. ~ Congruency, switch = "both") +
+    coord_cartesian(ylim = ylimit_cf_fi_rt) +  # set the limit for y axis c(0, 1100)
+    labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axis
+    theme(legend.position = "none") +
+    NULL
+
+# ggsave(filename = "E1_fi_rte.pdf", plot_E1_cffi_rte, width = 7, height = 4.55)
+plot_E1_cffi_rte
+```
+
+```{r combined plot rte E1, fig.asp=.5}
+
+plot_E1_cf_rte_ <- plot_E1_cf_rte +
+    guides(color = guide_legend(nrow = 1, title.position = "left"), 
+           linetype = guide_legend(nrow = 1, title.position = "left")) +
+    theme(legend.position = c(0.6, 0.1),
+          legend.box = "horizontal",
+          legend.key.height = unit(0.01, "cm")) 
+
+plot_E1_rte <- ggarrange(plot_E1_cf_rte_, plot_E1_cffi_rte, 
+                         labels = c("a", "b"),
+                         font.label = (list(size = 18)),
+                         widths = c(1.5, 1),
+                         nrow = 1)
+
+# ggsave(filename = "E1_rte.pdf", plot_E1_rte, width = 10, height = 4.5)
+plot_E1_rte
+```
+
+#### Comparisons between facilitation and interference
+```{r}
+contrast(emm_E1_rte_fi, method = list("faci-inte"=c(1, 1)), by = "Cue")[1:2] %>% 
+    summary(infer = TRUE)
+```
+
+## Response times (Experiment 2)
+
+### Fitting the generalized mixed models
+without log-transformation.
+#### The maximal model
+```{r E2 rte max}
+# file_E2_rte_max <- file.path(folder_lmm, "E2_rte_lmm_max.RData")
+# 
+# # fit the max model
+# if (!file.exists(file_E2_rte_max)) {
+#   lmm_E2_rte_max <- glmer(
+#     log(RT) ~ Cue * Congruency * Alignment * Probability + 
+#       (Cue * Congruency * Alignment * Probability | Participant), 
+#     family = lognormal(),
+#     data = df_lmm_E2_rt,
+#     control = glmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+#                            optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+#   )
+# 
+#   save(lmm_E2_rte_max, file = file_E2_rte_max)
+# } else {
+#   load(file_E2_rte_max)
+# }
+# 
+# print(summary(lmm_E2_rte_max), corr = FALSE)
+
+```
+
+
+#### The zero-correlation-parameter model
+```{r E2 rte zcp}
+file_E2_rte_zcp <- file.path(folder_lmm, "E2_rte_lmm_zcp.RData")
+
+# fit the zcp1 model
+if (!file.exists(file_E2_rte_zcp)) {
+    lmm_E2_rte_zcp <- lmer(
+        RT ~ Cue * Congruency * Alignment * Probability +  
+            (Cue_C + Con_C + Ali_C + 
+                 Cue_Con + Cue_Ali + Con_Ali + 
+                 Cue_Con_Ali +
+                 Pro_C +
+                 Cue_Pro + Con_Pro + Ali_Pro + 
+                 Cue_Con_Pro + Cue_Ali_Pro + Con_Ali_Pro + 
+                 Cue_Con_Ali_Pro || Participant),
+        data = df_lmm_E2_rt,
+        control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+                              optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+    )
+    # save(lmm_E2_rte_zcp, file = file_E2_rte_zcp)
+} else {
+    load(file_E2_rte_zcp)
+}
+
+print(summary(lmm_E2_rte_zcp), corr = FALSE)
+```
+
+#### The reduced model
+```{r PCA analysis for rte zcp lmm E2}
+summary(rePCA(lmm_E2_rte_zcp))
+```
+
+`Cue_Con`, `Con_Ali`, `Cue_Con_Pro`, `Ali_Pro`, and `Con_Pro`, were removed from extended model (`lmm_E2_rte_zcp`) due to that the variance it explained was smaller than 0.1%, making `lmm_E2_rte_rdc`.
+
+```{r E2 rte rdc}
+file_E2_rte_rdc <- file.path(folder_lmm, "E2_rte_lmm_rdc.RData")
+
+# fit the rdc1 model
+if (!file.exists(file_E2_rte_rdc)) {
+    lmm_E2_rte_rdc <- lmer(
+        RT ~ Cue * Congruency * Alignment * Probability +  
+            (Cue_C + Con_C + Ali_C + 
+                 Cue_Ali + # Cue_Con + Con_Ali + 
+                 Cue_Con_Ali +
+                 Pro_C +
+                 Cue_Pro + # Con_Pro + Ali_Pro + 
+                 Cue_Ali_Pro + Con_Ali_Pro + # Cue_Con_Pro + 
+                 Cue_Con_Ali_Pro || Participant),
+        data = df_lmm_E2_rt,
+        control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+                              optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+    )
+    # save(lmm_E2_rte_rdc, file = file_E2_rte_rdc)
+} else {
+    load(file_E2_rte_rdc)
+}
+
+print(summary(lmm_E2_rte_rdc), corr = FALSE)
+```
+
+#### The extended model
+```{r E2 rte etd}
+file_E2_rte_etd <- file.path(folder_lmm, "E2_rte_lmm_etd.RData")
+
+# fit the etd model
+if (!file.exists(file_E2_rte_etd)) {
+    lmm_E2_rte_etd <- lmer(
+        RT ~ Cue * Congruency * Alignment * Probability +  
+            (Cue_C + Con_C + Ali_C + 
+                 Cue_Ali + # Cue_Con + Con_Ali + 
+                 Cue_Con_Ali +
+                 Pro_C +
+                 Cue_Pro + # Con_Pro + Ali_Pro + 
+                 Cue_Ali_Pro + Con_Ali_Pro + # Cue_Con_Pro + 
+                 Cue_Con_Ali_Pro | Participant),
+        data = df_lmm_E2_rt,
+        control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+                              optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+    )
+    # save(lmm_E2_rte_etd, file = file_E2_rte_etd)
+} else {
+    load(file_E2_rte_etd)
+}
+
+print(summary(lmm_E2_rte_etd), corr = FALSE)
+```
+
+```{r PCA analysis for E2 rte etd lmm}
+summary(rePCA(lmm_E2_rte_etd))
+```
+`Con_C`, `Ali_C`, `Cue_C`, `Cue_Ali`, `Cue_Con_Ali` and `Con_Ali_Pro` were removed from extended model.
+
+```{r E2 rte etd1}
+file_E2_rte_etd1 <- file.path(folder_lmm, "E2_rte_lmm_etd1.RData")
+
+# fit the etd1 model
+if (!file.exists(file_E2_rte_etd1)) {
+    lmm_E2_rte_etd1 <- lmer(
+        RT ~ Cue * Congruency * Alignment * Probability +  
+            (# Cue_C + Con_C + Ali_C + 
+                 # Cue_Ali + # Cue_Con + Con_Ali + 
+                 # Cue_Con_Ali +
+                 Pro_C +
+                 Cue_Pro + # Con_Pro + Ali_Pro + 
+                 Cue_Ali_Pro +  # Con_Ali_Pro + Cue_Con_Pro + 
+                 Cue_Con_Ali_Pro | Participant),
+        data = df_lmm_E2_rt,
+        control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+                              optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+    )
+    # save(lmm_E2_rte_etd1, file = file_E2_rte_etd1)
+} else {
+    load(file_E2_rte_etd1)
+}
+
+print(summary(lmm_E2_rte_etd1), corr = FALSE)
+```
+
+```{r PCA analysis for E2 rte etd1 lmm}
+summary(rePCA(lmm_E2_rte_etd1))
+```
+`Cue_Con_Ali_Pro` was removed from extended model.
+
+```{r E2 rte etd2}
+file_E2_rte_etd2 <- file.path(folder_lmm, "E2_rte_lmm_etd2.RData")
+
+# fit the etd2 model
+if (!file.exists(file_E2_rte_etd2)) {
+    lmm_E2_rte_etd2 <- lmer(
+        RT ~ Cue * Congruency * Alignment * Probability +  
+            (# Cue_C + Con_C + Ali_C + 
+                 # Cue_Ali + # Cue_Con + Con_Ali + 
+                 # Cue_Con_Ali +
+                 Pro_C +
+                 Cue_Pro + # Con_Pro + Ali_Pro + 
+                 Cue_Ali_Pro   # +Con_Ali_Pro + Cue_Con_Pro + 
+                 | Participant), # Cue_Con_Ali_Pro 
+        data = df_lmm_E2_rt,
+        control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+                              optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+    )
+    # save(lmm_E2_rte_etd2, file = file_E2_rte_etd2)
+} else {
+    load(file_E2_rte_etd2)
+}
+
+print(summary(lmm_E2_rte_etd2), corr = FALSE)
+```
+
+#### The optimal model
+```{r E2 comapre rte etd and rdc}
+# compare the extended and reduced model
+anova(lmm_E2_rte_etd2, lmm_E2_rte_rdc, refit = FALSE)
+```
+
+According to BIC, the reduced model (`lmm_E2_rte_rdc`) explained the data better than the extended model (`lmm_E2_rte_etd1`) and, therefore, the reduced model is used as the optimal model.
+
+```{r E2 the optimal model rte}
+lmm_E2_rte_opt <- lmm_E2_rte_rdc
+
+print(summary(lmm_E2_rte_opt), corr = FALSE)
+```
+
+```{r}
+resi_E2_lmm <- plot(lmm_E2_rte_opt, resid(., scaled=TRUE) ~ fitted(.), abline = 0,
+                    ylim = c(-6, 47),
+                    xlab = "Fitted values (RT)",
+                    ylab = "Scaled residuals",
+                    main= "LMM without log-transformation (Experiment 2)")
+resi_E2_lmm
+```
+
+```{r}
+resi_E2_glmm <- plot(glmm_E2_rt_opt, resid(., scaled=TRUE) ~ fitted(.), abline = 0,
+                     ylim = c(-6, 47),
+                     xlab = "Fitted values (log(RT))",
+                     ylab = "Scaled residuals",
+                     main = "GLMM with log-transformation (Experiment 2)") 
+resi_E2_glmm
+```
+
+
+### Estimated marginal means
+#### Estimated marginal means for RT
+```{r E2 emm rte}
+file_E2_rte_emm <- file.path(folder_lmm, "E2_rte_emm.RData") 
+if (!file.exists(file_E2_rte_emm)) {
+    emm_E2_rte <- emmeans(lmm_E2_rte_opt, ~ Cue + Congruency + Alignment + Probability)
+} else {
+    load(file_E2_rte_emm)
+}
+
+summary(emm_E2_rte) # equivalent to regrid(emm_rte)
+
+# emmip(regrid(emm_E2_rte), Congruency ~ Alignment | Cue + Probability, CIs = TRUE)
+```
+
+```{r plot for publication E2 rte slides, fig.asp=.6}
+plot_E2_cf_rte <- summary(emm_E2_rte) %>% 
+    as_tibble() %>% 
+    ggplot(aes(y = emmean, x = Alignment, color = Congruency, group = Congruency)) +
+    geom_point(position = position_dodge(width = 0.1), size = 2) +
+    geom_line(aes(linetype = Congruency), position = position_dodge(width = 0.1),
+              size = 0.8) +
+    scale_linetype_manual(values=c("solid", "dashed"))+
+    scale_color_manual(values=con_color) +
+    geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
+                  alpha = .6, position = position_dodge(width = 0.1),
+                  show.legend = F) + 
+    facet_grid(Probability ~Cue, switch = "x",
+               labeller = labeller(Probability = c(`0.25` = "25% cueing top", `0.75` = "75% cueing top"))) +
+    coord_cartesian(ylim = ylimit_cf_rt) +  # set the limit for y axis c(0, 1100)
+    labs(x = "Target half", y = "Correct response times (ms)", fill = "Congruency") +  # set the names for main, x and y axises
+    geom_text(label = c("", "", "**", "***", "", "", "", "", "", "", "", "*", "", "", "", ""), color = sig_color, size = 6, nudge_y = 50, nudge_x = 0.5) + # add starts to the significant columns
+    NULL
+
+# ggsave(filename = "E2_cf_rte.pdf", plot_E2_cf_rte, width = 8, height = 4.8)
+plot_E2_cf_rte
+```
+
+#### Composite effects
+Composite face effects for top and bottom parts:
+```{r}
+emm_E2_rte_cf <- contrast(regrid(emm_E2_rte), interaction = "pairwise", by = c("Cue", "Probability"), infer = TRUE)
+emm_E2_rte_cf[1:4]
+```
+
+```{r}
+emm_E2_rte_con <- contrast(regrid(emm_E2_rte), interaction = "pairwise", by = c("Cue", "Probability", "Alignment"))
+summary(emm_E2_rte_con[c(1,2,5,6)], infer = TRUE)
+```
+
+#### Facilitation and interference
+```{r}
+emm_E2_rte_fi <- contrast(regrid(emm_E2_rte), "pairwise", by = c("Cue", "Congruency", "Probability"), infer=TRUE, adjust = "sidak")
+emm_E2_rte_fi[1:8]
+```
+
+```{r message=FALSE}
+# emmip(emm_E2_rte_fi[1:8], ~ Probability | Cue + Congruency, CIs = TRUE, adjust = "sidak") +
+#   geom_hline(yintercept = 0, linetype = "dashed")
+```
+
+```{r fi E2 rte, fig.asp=.65}
+plot_E2_cffi_rte <- emm_E2_rte_fi[1:8] %>% 
+    as_tibble() %>% 
+    ggplot(aes(y = estimate, x = Cue, color = Congruency)) +
+    geom_point(size = 2) +
+    geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), size=1.5, width=0, 
+                  alpha = .6) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    scale_color_manual(values=con_color) +
+    facet_grid(Probability ~ Congruency, switch = "x",
+               labeller = labeller(Probability = c(`0.25` = "25% cueing top", `0.75` = "75% cueing top"))) +
+    coord_cartesian(ylim = ylimit_cf_fi_rt) +  # set the limit for y axis c(0, 1100)
+    labs(x = "Congruency", y = expression(RT~"(aligned-misaligned)")) +  # set the names for main, x and y axis
+    theme(legend.position = "none") +
+    NULL
+
+# ggsave(filename = "E2_fi_rte.pdf", plot_E2_cffi_rte, width = 7, height = 4.55)
+plot_E2_cffi_rte
+```
+
+```{r combined plot rte E2, fig.asp=.5}
+
+plot_E2_cf_rte_ <- plot_E2_cf_rte +
+    guides(color = guide_legend(nrow = 1, title.position = "left"), 
+           linetype = guide_legend(nrow = 1, title.position = "left")) +
+    theme(legend.position = c(0.6, 0.5),
+          legend.box = "horizontal") 
+
+plot_E2_rte <- ggarrange(plot_E2_cf_rte_, plot_E2_cffi_rte, 
+                         labels = c("a", "b"),
+                         font.label = (list(size = 18)),
+                         widths = c(1.5, 1),
+                         nrow = 1)
+
+# ggsave(filename = "E2_rte.pdf", plot_E2_rte, width = 10, height = 7)
+plot_E2_rte
+```
+
+#### Comparisons between facilitation and interference
+```{r}
+contrast(emm_E2_rte_fi, method = list("faci-inte"=c(1, 1)), by = c("Cue", "Probability"))[1:4] %>% 
+    summary(infer = TRUE)
+```
+
+## Residuals vs. fitted values
+
+```{r fig.width=7, fig.asp=.7}
+ggarrange(resi_E1_lmm, resi_E1_glmm,
+          resi_E2_lmm, resi_E2_glmm)
+ggsave("residuals_vs_fitted.png", width = 12, height = 8.4)
+```
+
+
 # Session information {.unlisted .unnumbered}
 ```{r}
 sessionInfo()
