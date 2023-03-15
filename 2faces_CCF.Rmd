@@ -2355,7 +2355,7 @@ plot_E12 <- ggarrange(plot_E12_cf_d_, plot_E12_cffi_d,
 plot_E12
 ```
 
-# LMM on RT (reply)
+# LMM on RT (without log transformation)
 ## Response times (Experiment 1)
 
 ### Fitting the linear mixed models
