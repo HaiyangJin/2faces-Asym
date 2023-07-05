@@ -2355,7 +2355,7 @@ plot_E12 <- ggarrange(plot_E12_cf_d_, plot_E12_cffi_d,
 plot_E12
 ```
 
-# LMM on RT (without log transformation)
+# Rebuttal R1: LMM on RT (without log transformation)
 This analysis was included to reply to reviewers' question on the possibility of `lognormal()` distorting the response time results. 
 
 In a nutshell, 1) comparing to the models fitted without `lognormal()`, residuals in models fitted with `lognormal()` were more normally distributed. 2) the results from models fitted without and with `lognormal()` were similar. 
@@ -2948,7 +2948,7 @@ ggarrange(resi_E1_lmm, resi_E1_glmm,
 ggsave("residuals_vs_fitted.png", width = 12, height = 8.4)
 ```
 
-# Possible floor effects for interference
+# Rebuttal R2: Possible floor effects for interference
 
 First, participants did not demonstrate floor effect overall in both experiments. 
 
@@ -2984,7 +2984,7 @@ summary(emm_E2_d[c(7,8,15,16)], infer = c(TRUE, TRUE), adjust = "none")
 ```
 
 
-# Unbalanced design due to the different numbers of correct trials
+# Rebuttal R2: Unbalanced design due to the different numbers of correct trials
 
 ```{r}
 df_lmm_E2 %>% 
@@ -2995,12 +2995,6 @@ df_lmm_E2 %>%
 ```
 
 ## Experiment 1 -- Response times (all trials)
-```{r only keep correct trials (but with both same and different trials) E1}
-# df_lmm_E1_rt <- df_lmm_E1 %>% 
-#   filter(isCorrect == 1)
-
-# save(df_lmm_E1_rt, file = file.path("data", "df_lmm_E1_rt.RData"))
-```
 
 ### Fitting the generalized mixed models
 with log-transformation.
@@ -3246,12 +3240,6 @@ contrast(emm_E1_rtall_fi, method = list("faci-inte"=c(1, 1)), by = "Cue")[1:2] %
 
 
 ## Experiment 2 -- Response times (all trials)
-```{r only keep correct trials (but with both same and different trials) E2}
-# df_lmm_E2_rt <- df_lmm_E2 %>% 
-#   filter(isCorrect == 1)
-
-# save(df_lmm_E2_rt, file = file.path("data", "df_lmm_E2_rt.RData"))
-```
 
 ### Fitting the generalized mixed models
 with log-transformation.
@@ -3520,6 +3508,48 @@ emm_E2_rtall_fi_Prob[1:4]
 contrast(emm_E2_rtall_fi, method = list("faci-inte"=c(1, 1)), by = c("Cue", "Probability"))[1:4] %>% 
   summary(infer = TRUE)
 ```
+
+## Figures in rebuttal letter
+```{r}
+plot_E1_rtall <- ggarrange(plot_E1_cf_rtall_, plot_E1_cffi_rtall,
+                     labels = c("C", "D"),
+                     font.label = (list(size = 18)),
+                     widths = c(1.5, 1),
+                     nrow = 1, ncol = 2)
+# ggsave(filename = "E1_rtall.png", plot_E1_rtall, width = 10, height = 5)
+plot_E1_rtall
+```
+
+```{r}
+plot_E1_rt_ <- ggarrange(plot_E1_cf_rt_, plot_E1_cffi_rt,
+                     labels = c("C", "D"),
+                     font.label = (list(size = 18)),
+                     widths = c(1.5, 1),
+                     nrow = 1, ncol = 2)
+# ggsave(filename = "E1_rt_.png", plot_E1_rt_, width = 10, height = 5)
+plot_E1_rt_
+```
+
+```{r}
+plot_E2_rtall <- ggarrange(plot_E2_cf_rtall_, plot_E2_cffi_rtall,
+                     labels = c("C", "D"),
+                     font.label = (list(size = 18)),
+                     widths = c(1.5, 1),
+                     nrow = 1, ncol = 2)
+# ggsave(filename = "E2_rtall.png", plot_E2_rtall, width = 10, height = 8)
+plot_E2_rtall
+```
+
+```{r}
+plot_E2_rt_ <- ggarrange(plot_E2_cf_rt_, plot_E2_cffi_rt,
+                     labels = c("C", "D"),
+                     font.label = (list(size = 18)),
+                     widths = c(1.5, 1),
+                     nrow = 1, ncol = 2)
+# ggsave(filename = "E2_rt_.png", plot_E2_rt_, width = 10, height = 8)
+plot_E2_rt_
+```
+
 
 # Session information {.unlisted .unnumbered}
 ```{r}
