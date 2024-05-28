@@ -2,8 +2,8 @@
 
 This repository stores the analysis and other materials for "Facilitation and interference are asymmetric in holistic face processing" article. 
 
-The open materials can be found: https://osf.io/yhm3s/.   
-The preprint is avaiable at: https://psyarxiv.com/qa8ys.
+The open science repository can be found at: https://osf.io/yhm3s/.   
+The published paper is available at: [https://doi.org/10.3758/s13423-024-02481-9](https://doi.org/10.3758/s13423-024-02481-9).
 
 ## Abstract
 
