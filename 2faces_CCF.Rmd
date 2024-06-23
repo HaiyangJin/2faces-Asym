@@ -183,8 +183,7 @@ b. Facilitation and interference effects were tested by pairwise comparisons bet
 # Experiment 1
 ```{r only keep E1}
 df_lmm_E1 <- df_lmm %>% 
-  filter(Experiment == "109_cue") %>% 
-  droplevels()
+  filter(Experiment == "109_cue") 
 
 # save(df_lmm_E1, file = file.path("data", "df_lmm_E1.RData"))
 ```
@@ -833,7 +832,7 @@ contrast(emm_E1_rt_fi, method = list("faci-inte"=c(1, 1)), by = "Cue")[1:2] %>%
 ```{r only keep E2}
 df_lmm_E2 <- df_lmm %>% 
   filter(Experiment != "109_cue") %>% 
-  droplevels() 
+  mutate(Probability = factor(Probability))
 
 contrasts(df_lmm_E2$Probability) <- MASS::contr.sdif(2)
 
@@ -3548,6 +3547,30 @@ plot_E2_rt_ <- ggarrange(plot_E2_cf_rt_, plot_E2_cffi_rt,
                      nrow = 1, ncol = 2)
 # ggsave(filename = "E2_rt_.png", plot_E2_rt_, width = 10, height = 8)
 plot_E2_rt_
+```
+
+# Rebuttal R3: Accuracy across conditions
+
+## Experiment 1
+
+```{r}
+df_acc <- df_lmm %>% 
+    mutate(Experiment = if_else(Experiment == "109_cue", "E1", "E2")) %>% 
+    group_by(Experiment, Participant, Cue, Probability, Congruency, Alignment) %>% 
+    summarize(acc = mean(isCorrect),
+              .groups = "drop") %>% 
+    group_by(Experiment, Cue, Probability, Congruency, Alignment) %>% 
+    summarize(acc = mean(acc),
+              .groups = "drop") 
+
+df_acc %>% 
+    pivot_wider(names_from = c(Congruency, Alignment), values_from = acc)
+```
+
+```{r}
+df_acc %>% 
+    group_by(Experiment) %>% 
+    summarize(overall_acc = mean(acc))
 ```
 
 
