@@ -11,8 +11,8 @@ load("df_lmm_E1_rt.RData")
 # message("Fitting glmm_E1_rt_zcp...")
 # glmm_E1_rt_zcp <- lmer(
 #     log(RT) ~ Cue * Congruency * Alignment +
-#         (Cue_C + Con_C + Ali_C + 
-#              Cue_Con + Cue_Ali + Con_Ali + 
+#         (Cue_C + Con_C + Ali_C +
+#              Cue_Con + Cue_Ali + Con_Ali +
 #              Cue_Con_Ali || Participant),
 #     data = df_lmm_E1_rt,
 #     control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
@@ -25,9 +25,9 @@ load("df_lmm_E1_rt.RData")
 # ######### rdc model #########
 # message("Fitting glmm_E1_rt_rdc...")
 # glmm_E1_rt_rdc <- lmer(
-#     log(RT) ~ Cue * Congruency * Alignment +  
-#         (Cue_C + Con_C + Ali_C + 
-#              Cue_Con + Cue_Ali + # Con_Ali + 
+#     log(RT) ~ Cue * Congruency * Alignment +
+#         (Cue_C + Con_C + Ali_C +
+#              Cue_Con + Cue_Ali + # Con_Ali +
 #              Cue_Con_Ali || Participant),
 #     data = df_lmm_E1_rt,
 #     control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
@@ -40,9 +40,9 @@ load("df_lmm_E1_rt.RData")
 ######### etd model #########
 # message("Fitting glmm_E1_rt_etd...")
 # glmm_E1_rt_etd <- lmer(
-#     log(RT) ~ Cue * Congruency * Alignment +  
-#         (Cue_C + Con_C + Ali_C + 
-#              Cue_Con + Cue_Ali + # Con_Ali + 
+#     log(RT) ~ Cue * Congruency * Alignment +
+#         (Cue_C + Con_C + Ali_C +
+#              Cue_Con + Cue_Ali + # Con_Ali +
 #              Cue_Con_Ali | Participant),
 #     data = df_lmm_E1_rt,
 #     control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
@@ -55,9 +55,9 @@ load("df_lmm_E1_rt.RData")
 ######### etd1 model #########
 # message("Fitting glmm_E1_rt_etd1...")
 # glmm_E1_rt_etd1 <- lmer(
-#     log(RT) ~ Cue * Congruency * Alignment +  
-#         (Cue_C + # Con_C + Ali_C + 
-#              Cue_Ali + # Con_Ali + Cue_Con + 
+#     log(RT) ~ Cue * Congruency * Alignment +
+#         (Cue_C + # Con_C + Ali_C +
+#              Cue_Ali + # Con_Ali + Cue_Con +
 #              Cue_Con_Ali | Participant),
 #     data = df_lmm_E1_rt,
 #     control = lmerControl(optimizer = "optimx", # calc.derivs = FALSE,
@@ -65,14 +65,6 @@ load("df_lmm_E1_rt.RData")
 # )
 # save(glmm_E1_rt_etd1, file = "E1_rt_lmm_etd1.RData")
 # message("etd1 for rt is finished.")
-
-
-######### emmeans #########
-# library(emmeans)
-# load("E1_rt_lmm_rdc.RData")
-# glmm_E1_rt_opt <- glmm_E1_rt_rdc
-# emm_E1_rt <- emmeans(glmm_E1_rt_opt, ~ Cue + Congruency + Alignment)
-# save(emm_E1_rt, file = "E1_rt_emm.RData")
 
 
 ######### emmeans for scf #########

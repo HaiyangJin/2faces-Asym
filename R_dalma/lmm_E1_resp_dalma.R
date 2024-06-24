@@ -10,10 +10,10 @@ load("df_lmm_E1.RData")
 ######### zcp model #########
 # message("Fitting glmm_E1_resp_zcp...")
 # glmm_E1_resp_zcp <- glmer(
-#     Resp ~ Cue * Congruency * Alignment * SameDifferent + 
-#         (Cue_C + Con_C + Ali_C + Sam_C + 
+#     Resp ~ Cue * Congruency * Alignment * SameDifferent +
+#         (Cue_C + Con_C + Ali_C + Sam_C +
 #              Cue_Con + Cue_Ali + Cue_Sam + Con_Ali + Con_Sam + Ali_Sam +
-#              Cue_Con_Ali + Cue_Con_Sam + Cue_Ali_Sam + Con_Ali_Sam + 
+#              Cue_Con_Ali + Cue_Con_Sam + Cue_Ali_Sam + Con_Ali_Sam +
 #              Cue_Con_Ali_Sam || Participant),
 #     family = binomial(link = "probit"),
 #     data = df_lmm_E1,
@@ -28,7 +28,7 @@ load("df_lmm_E1.RData")
 # message("Fitting glmm_E1_resp_rdc...")
 # glmm_E1_resp_rdc <- glmer(
 #     Resp ~ Cue * Congruency * Alignment * SameDifferent + 
-#         (Cue_C + Ali_C + Sam_C + # Con_C + 
+#         (Cue_C + Con_C + Ali_C + Sam_C +  
 #              Cue_Con + Cue_Ali + Cue_Sam + Con_Sam + # Con_Ali + Ali_Sam + 
 #              Cue_Con_Sam + Cue_Ali_Sam + Con_Ali_Sam + # Cue_Con_Ali + 
 #              Cue_Con_Ali_Sam || Participant),
@@ -45,7 +45,7 @@ load("df_lmm_E1.RData")
 # message("Fitting glmm_E1_resp_etd...")
 # glmm_E1_resp_etd <- glmer(
 #     Resp ~ Cue * Congruency * Alignment * SameDifferent + 
-#         (Cue_C + Ali_C + Sam_C + # Con_C + 
+#         (Cue_C + Con_C + Ali_C + Sam_C +  
 #              Cue_Con + Cue_Ali + Cue_Sam + Con_Sam + # Con_Ali + Ali_Sam + 
 #              Cue_Con_Sam + Cue_Ali_Sam + Con_Ali_Sam + # Cue_Con_Ali + 
 #              Cue_Con_Ali_Sam | Participant),
@@ -139,5 +139,21 @@ load("df_lmm_E1.RData")
 # )
 # save(glmm_E1_resp_etd5, file = "E1_Resp_lmm_etd5.RData")
 # message("etd5 is finished.")
+
+######### update etd model as etd6
+# message("Fitting glmm_E1_resp_etd6...")
+# glmm_E1_resp_etd6 <- glmer(
+#     Resp ~ Cue * Congruency * Alignment * SameDifferent + 
+#         (0 + # Con_C + Ali_C + Cue_C + Sam_C + 
+#              Cue_Sam + # Con_Ali + Ali_Sam + Cue_Con + Cue_Ali + Con_Sam + 
+#              Cue_Con_Sam # Cue_Con_Ali + Cue_Ali_Sam + Con_Ali_Sam + 
+#          | Participant), # Cue_Con_Ali_Sam
+#     family = binomial(link = "probit"),
+#     data = df_lmm_E1,
+#     control = glmerControl(optimizer = "optimx", # calc.derivs = FALSE,
+#                            optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE))
+# )
+# save(glmm_E1_resp_etd6, file = "E1_Resp_lmm_etd6.RData")
+# message("etd6 is finished.")
 
 toc()
